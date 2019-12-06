@@ -18,7 +18,8 @@ from pyairmore.request import AirmoreSession
 from pyairmore.services.device import DeviceService
 from pyairmore.services.messaging import MessagingService
 
-class TestCMHK_HSBC_VISA():
+
+class TestCMHK_DBS_MASTER():
 	
 	PIN_CODE = ""
 
@@ -31,7 +32,7 @@ class TestCMHK_HSBC_VISA():
 
 	def teardown_method(self, method):
 		self.driver.quit()
-		
+	
 	def waitForPasscodeLabel(self, method):
 	
 		global PIN_CODE
@@ -43,75 +44,69 @@ class TestCMHK_HSBC_VISA():
 		service = MessagingService(session)
 		messages = service.fetch_message_history()
 
-		pattern = "HSBC: Verification code is (\D{4}-)(\d{6})"
+		pattern = "For your online transaction, please use this MasterCard SecureCode One-Time Password: (\w{4})-(\d{6})"
 
 		for msg in messages:
 			group = re.findall(pattern, msg.content)
 			if len(group) > 0 and len(group[0]) > 0:
-				if group[0][0] == str(self.driver.find_element(By.ID, "passcodelabel").text):
+				if group[0][0] == str(self.driver.find_element(By.CSS_SELECTOR , "#pwdpage > table:nth-child(2) > tbody:nth-child(1) > tr:nth-child(3) > td:nth-child(1) > table:nth-child(3) > tbody:nth-child(1) > tr:nth-child(9) > td:nth-child(2) > span:nth-child(2)").text):
 					PIN_CODE = str(group[0][1])
 					return True
 		
 		return False
-	
-	def test_CMHK_HSBC_VISA(self):
-	
-		global PIN_CODE
-	
+  
+	def test_CMHK_DBS_MASTER(self):
 		self.driver.get("https://1cm.hk.chinamobile.com/bill/index.html")
-		self.driver.set_window_size(830, 921)
+		self.driver.set_window_size(1309, 914)
 		WebDriverWait(self.driver, 30).until(expected_conditions.element_to_be_clickable((By.ID, "BillPayment_msisdn")))
 		self.driver.find_element(By.ID, "BillPayment_msisdn").click()
 		self.driver.find_element(By.ID, "BillPayment_msisdn").send_keys(str(config.core['msisdn']))
-		
+
 		WebDriverWait(self.driver, 30).until(expected_conditions.element_to_be_clickable((By.ID, "BillPayment_amount")))
 		self.driver.find_element(By.ID, "BillPayment_amount").click()
 		self.driver.find_element(By.ID, "BillPayment_amount").send_keys("1")
+
+		WebDriverWait(self.driver, 30).until(expected_conditions.element_to_be_clickable((By.NAME, "yt0")))
 		self.driver.find_element(By.NAME, "yt0").click()
-		
-		WebDriverWait(self.driver, 60).until(expected_conditions.element_to_be_clickable((By.CSS_SELECTOR, ".paybutton_visa")))
-		self.driver.find_element(By.CSS_SELECTOR, ".paybutton_visa").click()
-		
+
+		WebDriverWait(self.driver, 30).until(expected_conditions.element_to_be_clickable((By.CSS_SELECTOR, ".paybutton_master")))
+		self.driver.find_element(By.CSS_SELECTOR, ".paybutton_master").click()
+
 		WebDriverWait(self.driver, 30).until(expected_conditions.element_to_be_clickable((By.ID, "cardNo2")))
 		self.driver.find_element(By.ID, "cardNo2").click()
-		self.driver.find_element(By.ID, "cardNo2").send_keys(str(config.hsbc_visa['cardNo']))
-		
+		self.driver.find_element(By.ID, "cardNo2").send_keys(str(config.dbs_black_world_master['cardNo']))
+
 		WebDriverWait(self.driver, 30).until(expected_conditions.element_to_be_clickable((By.ID, "epMonth2")))
 		self.driver.find_element(By.ID, "epMonth2").click()
 		dropdown = self.driver.find_element(By.ID, "epMonth2")
-		dropdown.find_element(By.XPATH, "//option[. = " + str(config.hsbc_visa['epMonth']) + "]").click()
+		dropdown.find_element(By.XPATH, "//option[. = " + str(config.dbs_black_world_master['epMonth']) + "]").click()
 		self.driver.find_element(By.ID, "epMonth2").click()
-		
+
 		WebDriverWait(self.driver, 30).until(expected_conditions.element_to_be_clickable((By.ID, "epYear2")))
 		self.driver.find_element(By.ID, "epYear2").click()
 		dropdown = self.driver.find_element(By.ID, "epYear2")
-		dropdown.find_element(By.XPATH, "//option[. = " + str(config.hsbc_visa['epYear']) + "]").click()
+		dropdown.find_element(By.XPATH, "//option[. = " + str(config.dbs_black_world_master['epYear']) + "]").click()
 		self.driver.find_element(By.ID, "epYear2").click()
-		
+
 		WebDriverWait(self.driver, 30).until(expected_conditions.element_to_be_clickable((By.ID, "cardHolder2")))
 		self.driver.find_element(By.ID, "cardHolder2").click()
-		self.driver.find_element(By.ID, "cardHolder2").send_keys(str(config.hsbc_visa['cardHolder']))
-		
+		self.driver.find_element(By.ID, "cardHolder2").send_keys(str(config.dbs_black_world_master['cardHolder']))
+
 		WebDriverWait(self.driver, 30).until(expected_conditions.element_to_be_clickable((By.NAME, "securityCode2")))
 		self.driver.find_element(By.NAME, "securityCode2").click()
-		self.driver.find_element(By.NAME, "securityCode2").send_keys(str(config.hsbc_visa['securityCode']))
-		
+		self.driver.find_element(By.NAME, "securityCode2").send_keys(str(config.dbs_black_world_master['securityCode']))
+
 		WebDriverWait(self.driver, 30).until(expected_conditions.element_to_be_clickable((By.NAME, "submitBut")))
 		self.driver.find_element(By.NAME, "submitBut").click()
 		self.driver.switch_to.alert.accept()
-		try :
-			# 24 | click | id=authsubmit |  | 
-			WebDriverWait(self.driver, 30).until(expected_conditions.element_to_be_clickable((By.ID, "authsubmit")))
-			self.driver.find_element(By.ID, "authsubmit").click()
-		except:
-			# 24 | click | id=enterPIN |  | 
-			WebDriverWait(self.driver, 120).until(self.waitForPasscodeLabel)
-			WebDriverWait(self.driver, 30).until(expected_conditions.element_to_be_clickable((By.ID, "enterPIN")))
-			self.driver.find_element(By.ID, "enterPIN").click()
-			self.driver.find_element(By.ID, "enterPIN").send_keys(PIN_CODE)
-			# 26 | click | id=btnOtpSubmit |  | 
-			self.driver.find_element(By.ID, "btnOtpSubmit").click()
-			
+
+		WebDriverWait(self.driver, 120).until(self.waitForPasscodeLabel)
+		WebDriverWait(self.driver, 30).until(expected_conditions.element_to_be_clickable((By.NAME, "completepin")))
+		self.driver.find_element(By.NAME, "completepin").click()
+		self.driver.find_element(By.NAME, "completepin").send_keys(PIN_CODE)
+		self.driver.find_element(By.CSS_SELECTOR, "tr:nth-child(10) input").click()
+
 		WebDriverWait(self.driver, 60).until(expected_conditions.element_to_be_clickable((By.CSS_SELECTOR, ".paymentBtn:nth-child(1)")))
 		self.driver.find_element(By.CSS_SELECTOR, ".paymentBtn:nth-child(1)").click()
 		self.driver.close()
+

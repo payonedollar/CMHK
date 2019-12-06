@@ -4,7 +4,7 @@ core = {
 	'airmore_server': '<AirMore Server IP>'
 }
 		 
-dbs_master = {
+dbs_black_world_master = {
 	'cardNo': '<Credit Card No.>',
 	'epMonth': '<Credit Card Expired Month>',
 	'epYear': '<Credit Card Expired Year>',
@@ -12,7 +12,7 @@ dbs_master = {
 	'securityCode': '<Credit Card Security Code>'
 }
 
-hsbc_visa = {
+hsbc_platinum_visa = {
 	'cardNo': '<Credit Card No.>',
 	'epMonth': '<Credit Card Expired Month>',
 	'epYear': '<Credit Card Expired Year>',
